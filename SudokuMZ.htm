@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<title>Sudoku MZ</title>
+<style>
+table{white-space:pre;display:inline-table;border:1pt solid;font-family:monospace}
+</style>
+
+<b>Sudoku game creator for LEC CP/M on Sharp MZ-800</b><br>
+<p style=float:left;margin-right:12pt><textarea id=ta rows=10 cols=9></textarea>
+<br><button onclick=addPuzzle() style=margin-top:3pt>Add</button>
+<pre style=font-size:small>Example:
+   26 7 1
+68  7  9 
+19   45  
+82 1   4 
+  46 29  
+ 5   3 28
+  93   74
+ 4  5  36
+7 3 18   </pre>
+<div id=inc style="clear:left;margin:4pt 0">Use the text area to input sudoku puzzles.
+<br>Then use the button/link below to save the created program.
+</div>
+<div style=float:left;margin-right:4pt>sudoku.com<br>sudoku.txt</div>
+<button id=btn disabled onclick="navigator.msSaveBlob(getBlob(),'sudoku.com')">
+Save file</button><br>
+<button id=btt disabled onclick="navigator.msSaveBlob(getBlobTxt(),'sudoku.txt')">
+Save file</button>
+
+<script>
+// Sudoku Game Creator for LEC CP/M on Sharp MZ-800, version 1.1, January 2018
+// by Lukas Petru
+
+// Open source under the MIT License (Expat).
+
+navigator.msSaveBlob?0:(btn.outerHTML=
+`<a id=btn onclick=link() oncontextmenu=return(link()) download=sudoku.com
+ style=color:#00e>Save file</a>`,btt.outerHTML=
+`<a id=btt onclick=linkTxt() oncontextmenu=return(linkTxt()) download=sudoku.txt
+ style=color:#00e>Save file</a>`)
+
+link=_=>data?btn.href=URL.createObjectURL(getBlob(URL.revokeObjectURL(btn.href))):
+ !!alert("Add puzzles first")
+linkTxt=_=>data?btt.href=URL.createObjectURL(getBlobTxt(URL.revokeObjectURL(btt.href))):
+ !!alert("Add puzzles first")
+
+tbl=0,data=""
+
+addPuzzle=(s,m,o,i,j,d)=>{
+ s=ta.value.match(/(?:.{9}\n){8}.{9}/)
+ if(!s) {alert("Wrong input format");return}
+ for(o="<table rules=all>",j=0;j<3;j++)for(i=0;i<3;i++)
+  m=s[0].slice(j*30+i*3).match(/(...)\n?...\n?...\n?(...)\n?...\n?...\n?(...)/),
+  o+=(i?"":"<tr>")+"<td>"+m.slice(1).join("\n")
+ d=s[0].replace(/\n/g,"").replace(/[^1-9]/g,"0")
+ if(!packData(d+data)) return alert("Cannot add item. Data capacity exceeded.")
+ data=d+data,inc.innerHTML=(tbl++?inc.innerHTML:"")+o+"</table> "
+ btn.disabled=btt.disabled=false
+}
+
+packData=s=>{
+ for(var l,a=[],i=j=0;i<s.length;i++,j++)
+  j&1?a[j>>1]|=s[i]:a.push(s[i]<1&&s[i+1]<1?(i++,160):s[i]<<4)
+ return l=0x600+s.length,a.length>269?0:Int8Array.of(48+s.length/81,63,36,
+ l&255,l>>8,...a)
+}
+
+getCode=_=>Int8Array.from(atob(`
+EVsGIeACfg8PDw/mD/4KOAOXEhMSE34jEhPLVCjoEccCzYwCzTQC1jI4CDxHzT8CyBD6PhrNoQIO/ZfN
+bwLNkwIhrAIOBx60BgPLQSgEXiMGARYCxdUOBxoGActBIAkT/oM+gd4ABgXNoQIQ+w0g6M2TAtHBENsN
+IMwOCQYJzUwC5g93KAX2MM1vAhDxDSDsBAyXzW8C2c00Atn+A8j+ByiW/iAwHw3+BSgTDAz+GCgNDQX+
+EygCBAR4zWMCR3nNYwJPGM0IzUwCtyDGCM2hAvawd9khAAWXdy0g/A4JBgnNVALmDygnVwcHB4JXgCYF
+bzR5xlGCbzQen3g9HBwc1gMw+Xk9HNYDMPt7gm80ENANIMsO8y4Kl+2x2SimIcYCNEYO/T63zW8CzT8C
+wjgBDgqXGDsOBh7/zQUAtyj2ySreAhGv/xki3gJ9t8nNVAL+sNiXyXkHBweBgBYAXyreAhl+ybcgAj4J
+/gogAj4BycXZwRHEAhIbeIfGLxIbef4E3gD+B94AxiYSEcACDgnNBQDZyT4OPc2hAv4JIPjNoQLJ2fUO
+Al/NBQDx2cmwuLi8h4qKhoKCgoKLg4OJhIiIhRs9ICAgJABTdGFydCBmcm9tIHB1enpsZSAxLQ==`),
+x=>x.charCodeAt(0))
+
+getBlob=_=>new Blob([getCode(),packData(data)])
+
+getBlobTxt=_=>new Blob([`Sudoku for LEC CP/M
+v. 1.1, January 2018
+
+Place all of the numbers 1 to 9 into each row, column and 3x3 box.
+Keys:
+arrow	move
+1-9	place a number to a cell
+space	clear a cell
+CLR	clear the grid
+^C	exit
+
+Copyright 2018 Lukas Petru
+Permission is hereby granted, free of charge, to any person obtaining a \
+copy of this software and associated documentation files (the "Software"), \
+to deal in the Software without restriction, including without limita\
+tion the rights to use, copy, modify, merge, publish, distribute, subli\
+cense, and/or sell copies of the Software, and to permit persons to whom\
+ the Software is furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all\
+  copies or substantial portions of the Software.`
+.replace(/\n+/g,"\r$&")])
+</script>
