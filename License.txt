@@ -1,4 +1,4 @@
-Sudoku Game Creator License
+MIT License
 
 Copyright (c) 2018 Lukas Petru
 
